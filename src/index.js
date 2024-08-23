@@ -1,17 +1,76 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import "./styles.css";
+import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom/client";
+import Header from "./components/Header";
+import Body from "./components/Body";
+import { createBrowserRouter, RouterProvider,Outlet} from "react-router-dom";
+import About from "./components/About";
+import Contact from "./components/Contact";
+import Error from "./components/Error";
+import RestaurantMenu from "./components/RestaurantMenu";
+import { lazy ,Suspense} from "react";
+import UserContext from "./utils/UserContext";
+import { Provider } from "react-redux";
+import appStore from "./utils/appStore";
+import Cart from "./components/Cart";
+//import Grocery from "./components/Grocery";
+const Grocery = lazy(() => import("./components/Grocery"));
+const AppLayout=() => {
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+    const [userName,setUserName]=useState();
+    useEffect(()=>{
+        const data={
+            name:"Geetha",
+        };
+        setUserName(data.name);
+    },[]);
+    return (
+        <Provider store={appStore}>
+        <UserContext.Provider value={{loggedInUser:userName,setUserName}}>
+        <div className="app">
+        <UserContext.Provider value={{loggedInUser:"Elon Musk"}}>
+            <Header />
+        </UserContext.Provider>
+            <Outlet/>
+          
+        </div>
+        </UserContext.Provider>
+        </Provider>
+    );
+};
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+const approuter=createBrowserRouter([
+    {
+        path:"/",
+        element:<AppLayout />,
+        errorElement:<Error/>,
+        children:[
+            {
+                path:"/",
+                element:<Body />,
+            },{
+            path:"/about",
+            element:<About />,
+        },
+        {
+            path:"/contact",
+            element:<Contact />,
+        },
+        {
+            path:"/cart",
+            element:<Cart />,
+        },
+        {
+            path:"/grocery",
+            element:<Suspense fallback={<h1>Loading.....</h1>}><Grocery /></Suspense>,
+        },
+        {
+            path:"/restaurants/:resId",
+            element:<RestaurantMenu />,
+        },],
+    },
+    
+]);
+const root= ReactDOM.createRoot(document.getElementById('root'));
+root.render(<RouterProvider router={approuter}/>);
+export default AppLayout;
