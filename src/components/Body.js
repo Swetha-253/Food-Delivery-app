@@ -46,15 +46,9 @@ const Body=() =>{
                <input type="text" className="border border-black m-4 p-4 h-1" 
             value={loggedInUser}
              onChange={(e)=>{setUserName(e.target.value);}}></input>
-
-           
-
-
-
-               
+              
             </div>
-          
-            <div className="flex flex-wrap">
+                <div className="flex flex-wrap">
                 {
                     filteredRestaurant.map((res)=>
                     <Link key={res.id} to={"/restaurants/"+res.id}>{res.veg?<RestaurantCardPromoted resData={res}/>:<RestaurantCard  resData={res}/>}</Link>)
